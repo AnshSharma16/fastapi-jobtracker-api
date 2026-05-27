@@ -60,3 +60,41 @@ def create_job(job: Job,db:Session=Depends(get_db)):
         }
     }
 
+@router.put("/jobs/{job_id}")
+def update_job(
+    job_id: int,
+    updated_job: Job,
+    db: Session = Depends(get_db)
+):
+
+    job = db.query(JobModel).filter(JobModel.id == job_id).first()
+
+    if not job:
+        return {"error": "Job not found"}
+
+    job.company = updated_job.company
+    job.role = updated_job.role
+    job.status = updated_job.status
+
+    db.commit()
+    db.refresh(job)
+
+    return {
+        "message": "Job updated successfully",
+        "job": job
+    }
+
+@router.delete("/jobs/{job_id}")
+def delete_job(job_id: int, db: Session = Depends(get_db)):
+
+    job = db.query(JobModel).filter(JobModel.id == job_id).first()
+
+    if not job:
+        return {"error": "Job not found"}
+
+    db.delete(job)
+    db.commit()
+
+    return {
+        "message": "Job deleted successfully"
+    }

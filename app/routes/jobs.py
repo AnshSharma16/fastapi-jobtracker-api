@@ -1,27 +1,11 @@
-
-'''from fastapi import APIRouter
-router=APIRouter()
-
-@router.get('/jobs')
-def get_jobs():
-    return [
-    {
-        "company": "OpenAI",
-            "role": "Python Backend Intern"
-    },
-    {
-         "company": "Anthropic",
-            "role": "AI Automation Developer"
-    }
-    ]'''
-
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas.job_schema import Job
 from app.models.job import JobModel
 from app.database.connection import SessionLocal
 
 router = APIRouter()
+
 
 # Database session dependency
 def get_db():
@@ -31,6 +15,8 @@ def get_db():
     finally:
         db.close()
 
+
+# GET ALL JOBS
 @router.get("/jobs")
 def get_jobs(db: Session = Depends(get_db)):
 
@@ -38,10 +24,28 @@ def get_jobs(db: Session = Depends(get_db)):
 
     return jobs
 
+
+# GET SINGLE JOB
+@router.get("/jobs/{job_id}")
+def get_job(job_id: int, db: Session = Depends(get_db)):
+
+    job = db.query(JobModel).filter(JobModel.id == job_id).first()
+
+    if not job:
+        raise HTTPException(
+            status_code=404,
+            detail="Job not found"
+        )
+
+    return job
+
+
+# CREATE JOB
 @router.post("/jobs")
-def create_job(job: Job,db:Session=Depends(get_db)):
-    new_job=JobModel(
-         company=job.company,
+def create_job(job: Job, db: Session = Depends(get_db)):
+
+    new_job = JobModel(
+        company=job.company,
         role=job.role,
         status=job.status
     )
@@ -60,6 +64,8 @@ def create_job(job: Job,db:Session=Depends(get_db)):
         }
     }
 
+
+# UPDATE JOB
 @router.put("/jobs/{job_id}")
 def update_job(
     job_id: int,
@@ -70,7 +76,10 @@ def update_job(
     job = db.query(JobModel).filter(JobModel.id == job_id).first()
 
     if not job:
-        return {"error": "Job not found"}
+        raise HTTPException(
+            status_code=404,
+            detail="Job not found"
+        )
 
     job.company = updated_job.company
     job.role = updated_job.role
@@ -81,16 +90,26 @@ def update_job(
 
     return {
         "message": "Job updated successfully",
-        "job": job
+        "job": {
+            "id": job.id,
+            "company": job.company,
+            "role": job.role,
+            "status": job.status
+        }
     }
 
+
+# DELETE JOB
 @router.delete("/jobs/{job_id}")
 def delete_job(job_id: int, db: Session = Depends(get_db)):
 
     job = db.query(JobModel).filter(JobModel.id == job_id).first()
 
     if not job:
-        return {"error": "Job not found"}
+        raise HTTPException(
+            status_code=404,
+            detail="Job not found"
+        )
 
     db.delete(job)
     db.commit()

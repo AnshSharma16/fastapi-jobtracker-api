@@ -29,6 +29,7 @@ def get_jobs(db: Session = Depends(get_db)):
 @router.get("/jobs/{job_id}")
 def get_job(job_id: int, db: Session = Depends(get_db)):
 
+    
     job = db.query(JobModel).filter(JobModel.id == job_id).first()
 
     if not job:

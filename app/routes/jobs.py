@@ -19,12 +19,25 @@ router = APIRouter()
 )
 def get_jobs(
     status: Optional[JobStatus] = None,
+    skip: int = 0,
+    limit: int = 10,
     db: Session = Depends(get_db)
 ):
     return job_service.get_all_jobs(
         db,
-        status
+        status,
+        skip,
+        limit
     )
+
+@router.get("/jobs/count")
+def count_jobs(
+    db: Session = Depends(get_db)
+):
+    return {
+        "count":
+        job_service.count_jobs(db)
+    }
 
 @router.get(
     "/jobs/{job_id}",
@@ -39,7 +52,6 @@ def get_job(
         db
     )
 
-
 @router.post(
     "/jobs",
     response_model=JobResponse,
@@ -53,7 +65,6 @@ def create_job(
         job,
         db
     )
-
 
 @router.patch(
     "/jobs/{job_id}",
@@ -82,3 +93,4 @@ def delete_job(
         job_id,
         db
     )
+

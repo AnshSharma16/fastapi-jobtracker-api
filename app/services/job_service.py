@@ -10,14 +10,25 @@ from app.schemas.job_schema import (
 
 def get_all_jobs(
     db: Session,
-    status: Optional[JobStatus] = None
+    status: Optional[JobStatus] = None,
+    skip:int=0,
+    limit:int=10
 ):
     query = db.query(JobModel)
     if status:
         query = query.filter(
             JobModel.status == status
         )
-    return query.all()
+    return query.order_by(
+        JobModel.created_at.desc()
+    ).offset(skip)\
+    .limit(limit)\
+    .all()
+
+def count_jobs(db: Session):
+    return db.query(
+        JobModel
+    ).count()
 
 def get_job_by_id(job_id: int, db: Session):
     job = db.query(JobModel).filter(JobModel.id == job_id).first()
@@ -77,3 +88,4 @@ def delete_job(
     return {
         "message": "Job deleted successfully"
     }
+

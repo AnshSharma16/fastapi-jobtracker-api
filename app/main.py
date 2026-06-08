@@ -2,8 +2,6 @@ from fastapi import FastAPI
 from app.routes.jobs import router as jobs_router
 from app.database.connection import Base, engine
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(
     title="Job Tracker API",
     version="1.0.0"

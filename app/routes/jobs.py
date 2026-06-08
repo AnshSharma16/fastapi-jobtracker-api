@@ -94,3 +94,8 @@ def delete_job(
         db
     )
 
+@router.post("/jobs/test-rollback")
+def test_rollback(
+    db: Session = Depends(get_db)
+):
+    return job_service.rollback_demo(db)

@@ -89,3 +89,29 @@ def delete_job(
         "message": "Job deleted successfully"
     }
 
+def rollback_demo(db: Session):
+
+    new_job = JobModel(
+        company="Rollback Test",
+        role="Backend Engineer",
+        status=JobStatus.applied
+    )
+
+    try:
+        db.add(new_job)
+
+        raise Exception(
+            "Simulated Failure"
+        )
+
+        db.commit()
+
+    except Exception:
+        db.rollback()
+
+        return {
+            "message":
+            "Rollback executed"
+        }
+    
+

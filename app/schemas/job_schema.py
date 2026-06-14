@@ -7,6 +7,7 @@ class JobCreate(BaseModel):
     company: str
     role: str
     status: JobStatus = JobStatus.applied
+    salary: int | None = None
 
     @field_validator("company", "role")
     @classmethod
@@ -19,6 +20,7 @@ class JobUpdate(BaseModel):
     company: Optional[str] = None
     role: Optional[str] = None
     status: Optional[JobStatus] = None
+    salary: Optional[int] = None
 
     @field_validator("company", "role")
     @classmethod
@@ -32,6 +34,8 @@ class JobResponse(BaseModel):
     company: str
     role: str
     status: str
+    salary: int | None = None
+    user_id: int | None = None
     created_at: datetime
     updated_at: datetime
     model_config = ConfigDict(from_attributes=True)

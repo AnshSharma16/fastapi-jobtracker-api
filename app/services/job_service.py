@@ -46,7 +46,8 @@ def create_job(job_data: JobCreate, db: Session):
     new_job = JobModel(
         company=job_data.company,
         role=job_data.role,
-        status=job_data.status
+        status=job_data.status,
+        salary=job_data.salary
     )
 
     db.add(new_job)
@@ -94,7 +95,8 @@ def rollback_demo(db: Session):
     new_job = JobModel(
         company="Rollback Test",
         role="Backend Engineer",
-        status=JobStatus.applied
+        status=JobStatus.applied,
+        salary=0
     )
 
     try:

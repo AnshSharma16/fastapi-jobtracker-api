@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, Enum
 from datetime import datetime,timezone
 from app.database.connection import Base
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 import enum
 
 class JobStatus(str, enum.Enum):
@@ -20,6 +22,9 @@ class JobModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     company = Column(String, index=True)
     role = Column(String)
+    salary = Column(Integer, nullable=True)
+    user_id = Column(Integer,ForeignKey("users.id"))
+    owner = relationship("UserModel",back_populates="jobs")
     status = Column(String,nullable=False,default=JobStatus.applied)
     created_at = Column(DateTime(timezone=True),nullable=False,default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True),nullable=False,default=datetime.utcnow,onupdate=datetime.utcnow)

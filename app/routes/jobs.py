@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, status
+from app.core.security import get_current_user
+from app.models.user import UserModel
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.models.job import JobStatus
@@ -21,9 +23,13 @@ def get_jobs(
     status: Optional[JobStatus] = None,
     skip: int = 0,
     limit: int = 10,
+    current_user: UserModel = Depends(
+        get_current_user
+    ),
     db: Session = Depends(get_db)
 ):
     return job_service.get_all_jobs(
+        current_user,
         db,
         status,
         skip,
@@ -59,10 +65,15 @@ def get_job(
 )
 def create_job(
     job: JobCreate,
+    current_user: UserModel = Depends(
+        get_current_user
+    ),
     db: Session = Depends(get_db)
 ):
+
     return job_service.create_job(
         job,
+        current_user,
         db
     )
 
@@ -94,8 +105,4 @@ def delete_job(
         db
     )
 
-@router.post("/jobs/test-rollback")
-def test_rollback(
-    db: Session = Depends(get_db)
-):
-    return job_service.rollback_demo(db)
+

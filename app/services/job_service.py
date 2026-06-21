@@ -9,12 +9,17 @@ from app.schemas.job_schema import (
 )
 
 def get_all_jobs(
+    current_user,
     db: Session,
     status: Optional[JobStatus] = None,
     skip:int=0,
     limit:int=10
 ):
-    query = db.query(JobModel)
+    query = db.query(
+    JobModel
+).filter(
+    JobModel.user_id == current_user.id
+)
     if status:
         query = query.filter(
             JobModel.status == status
@@ -41,13 +46,14 @@ def get_job_by_id(job_id: int, db: Session):
 
     return job
 
-def create_job(job_data: JobCreate, db: Session):
+def create_job(job_data: JobCreate,current_user, db: Session):
 
     new_job = JobModel(
         company=job_data.company,
         role=job_data.role,
         status=job_data.status,
-        salary=job_data.salary
+        salary=job_data.salary,
+        user_id=current_user.id
     )
 
     db.add(new_job)
@@ -89,31 +95,4 @@ def delete_job(
     return {
         "message": "Job deleted successfully"
     }
-
-def rollback_demo(db: Session):
-
-    new_job = JobModel(
-        company="Rollback Test",
-        role="Backend Engineer",
-        status=JobStatus.applied,
-        salary=0
-    )
-
-    try:
-        db.add(new_job)
-
-        raise Exception(
-            "Simulated Failure"
-        )
-
-        db.commit()
-
-    except Exception:
-        db.rollback()
-
-        return {
-            "message":
-            "Rollback executed"
-        }
-    
 

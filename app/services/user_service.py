@@ -1,3 +1,4 @@
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.user import UserModel
@@ -52,13 +53,13 @@ def create_user(
 
 
 def login_user(
-    user_data: UserLogin,
+    form_data: OAuth2PasswordRequestForm,
     db: Session
 ):
     user = db.query(
         UserModel
     ).filter(
-        UserModel.email == user_data.email
+        UserModel.email == form_data.username
     ).first()
 
     if not user:
@@ -68,7 +69,7 @@ def login_user(
         )
 
     is_valid = verify_password(
-        user_data.password,
+        form_data.password,
         user.hashed_password
     )
 

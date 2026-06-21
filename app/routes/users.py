@@ -1,4 +1,5 @@
 from app.core.security import get_current_user
+from fastapi.security import OAuth2PasswordRequestForm
 from app.models.user import UserModel
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -36,11 +37,11 @@ def register_user(
 
 @router.post("/login")
 def login(
-    user: UserLogin,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
     return user_service.login_user(
-        user,
+        form_data,
         db
     )
 
@@ -51,3 +52,4 @@ def get_me(
     )
 ):
     return current_user
+

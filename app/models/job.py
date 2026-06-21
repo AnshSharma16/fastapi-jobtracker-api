@@ -23,7 +23,8 @@ class JobModel(Base):
     company = Column(String, index=True)
     role = Column(String)
     salary = Column(Integer, nullable=True)
-    user_id = Column(Integer,ForeignKey("users.id"))
+    user_id = Column(Integer,ForeignKey("users.id"),nullable=False
+)
     owner = relationship("UserModel",back_populates="jobs")
     status = Column(String,nullable=False,default=JobStatus.applied)
     created_at = Column(DateTime(timezone=True),nullable=False,default=datetime.utcnow)

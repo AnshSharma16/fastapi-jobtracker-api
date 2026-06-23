@@ -51,10 +51,14 @@ def count_jobs(
 )
 def get_job(
     job_id: int,
+    current_user: UserModel = Depends(
+        get_current_user
+    ),
     db: Session = Depends(get_db)
 ):
     return job_service.get_job_by_id(
         job_id,
+        current_user,
         db
     )
 
@@ -84,25 +88,30 @@ def create_job(
 def update_job(
     job_id: int,
     job: JobUpdate,
+    current_user: UserModel = Depends(
+        get_current_user
+    ),
     db: Session = Depends(get_db)
 ):
     return job_service.update_job(
         job_id,
         job,
+        current_user,
         db
     )
-
 
 @router.delete(
     "/jobs/{job_id}"
 )
 def delete_job(
     job_id: int,
+    current_user: UserModel = Depends(
+        get_current_user
+    ),
     db: Session = Depends(get_db)
 ):
     return job_service.delete_job(
-        job_id,
-        db
-    )
-
-
+    job_id,
+    current_user,
+    db
+)

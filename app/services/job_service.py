@@ -35,8 +35,14 @@ def count_jobs(db: Session):
         JobModel
     ).count()
 
-def get_job_by_id(job_id: int, db: Session):
+def get_job_by_id(job_id: int, current_user, db: Session):
     job = db.query(JobModel).filter(JobModel.id == job_id).first()
+
+    if job.user_id != current_user.id:
+        raise HTTPException(
+        status_code=403,
+        detail="Not authorized"
+    )
 
     if not job:
         raise HTTPException(
@@ -66,9 +72,16 @@ def create_job(job_data: JobCreate,current_user, db: Session):
 def update_job(
     job_id: int,
     job_data: JobUpdate,
+    current_user,
     db: Session
 ):
     job = get_job_by_id(job_id, db)
+
+    if job.user_id != current_user.id:
+        raise HTTPException(
+        status_code=403,
+        detail="Not authorized"
+    )
 
     update_data = job_data.model_dump(
         exclude_unset=True
@@ -85,9 +98,16 @@ def update_job(
 
 def delete_job(
     job_id: int,
+    current_user,
     db: Session
 ):
     job = get_job_by_id(job_id, db)
+
+    if job.user_id != current_user.id:
+        raise HTTPException(
+        status_code=403,
+        detail="Not authorized"
+    )
 
     db.delete(job)
     db.commit()
